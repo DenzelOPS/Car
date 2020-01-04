@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Редактор</title>
+    <style>
+    .field{font-weight:bold;}
+    .error{color:red;}
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script>var token = '{{csrf_token}}';
+</script>
+</head>
+<body class="container">
+    <table>
+        <thead><th>Car_ID</th><th>Цвет</th><th>Год</th><th>Производитель</th></thead>
+        <tr>
+            <td>{{ car.car_id }}</td>
+            <td>{{ car.color }}</td>
+            <td>{{ car.year }}</td>
+            <td>{{ car.manufacturer }}</td>
+        </tr>
+    </table>
+    <td><button id="{{c.car_id}}" class="delete">Удалить</button>  <button id="redact">Редактировать</button></td>
+    <div id="slide" style="display:none;">
+    <form id="change">
+        <tr><p>
+            <label>Изменить цвет машины</label><br>
+            <input type="text" class="color"/>
+        </p>
+        <p>
+            <label>Изменить год</label><br>
+            <input type="number" class="year"/>
+        </p>
+        <p>
+            <label>Изменить производителя</label><br>
+            <input type="text" class="manufacturer"/>
+        </p>
+        <input type="submit" value="Применить изменения" id="{{car.car_id}}" class="edit" >
+    </tr></form></div>
+    <h2>Json:</h2>
+    <h4>{{ car_Json }}</h4>
+    <a href="http://127.0.0.1:8000/api/cars">
+   <input type="button" value="На главную" />
+</a>
+<script>
+var token = '{{csrf_token}}';
+    $("#redact").click(function(){$("#slide").slideToggle(500);
+    });
+
+
+        $(".delete").click(function(e) {
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: window.location.pathname,
+                type: 'DELETE',
+                success: function() {
+                    window.location = "/api/cars/"
+                }
+            });
+            });
+    $(".edit").click(function(e) {
+    e.preventDefault(); 
+    var json = {};
+    var car_id = $(e.target).attr("id");
+    var color = $("input.color").val();
+    var year = $("input.year").val();
+    var manufacturer = $("input.manufacturer").val();
+    json["car_id"]=car_id
+    if(color != ""){json["color"] = color};
+    if(year != ""){json["year"] = year};
+    if(manufacturer != ""){json["manufacturer"] = manufacturer};
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: window.location.pathname,
+                type: 'PATCH',
+                data: JSON.stringify({
+                json
+                }),
+                success: function() {
+                    window.location = "/api/cars/"+$(e.target).attr("id")+"/"
+                }
+            });
+            });
+</script>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>База машин</title>
+    <style>
+    .field{font-weight:bold;}
+    .error{color:red;}
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body class="container">
+    <form method="POST" id="form">
+        {% csrf_token %}
+        <p>
+            <label>Введите цвет машины</label><br>
+            <input type="text" name="color" id="color"/>
+        </p>
+        <p>
+            <label>Введите год</label><br>
+            <input type="number" name="year" id="year"/>
+        </p>
+        <p>
+            <label>Введите производителя</label><br>
+            <input type="text" name="manufacturer" id="manufacturer"/>
+        </p>
+        <input type="submit" value="Добавить в базу данных" id="submit" >
+    </form>
+    <h2>Машины:</h2>
+    {% if car.count > 0 %}
+    <table>
+        <thead><th>Car_ID</th><th>Цвет</th><th>Год</th><th>Производитель</th></thead>
+        {% for c in car %}
+        <tr>
+            <td>{{ c.car_id }}</td>
+            <td>{{ c.color }}</td>
+            <td>{{ c.year }}</td>
+            <td>{{ c.manufacturer }}</td>
+            <td><input type="submit" class="red" value="Изменить" id="{{c.car_id}}" name="red" /></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Json:</h2>
+    <h4>{{ car_Json }}</h4>
+    {% else %}
+    <h3>На данный момент машин в базе нет</h3>
+    {% endif %}
+    
+</body>
+
+<script>
+    var token = '{{csrf_token}}';
+        $(".red").click(function(e) {
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: $(e.target).attr("id")+"/",
+                type: 'GET',
+                success: function() {
+                    window.location = $(e.target).attr("id")+"/"
+                }
+            });
+        });
+</script>
+</html>
